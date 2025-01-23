@@ -80,7 +80,7 @@ update_interval = 300 # How often to check the API for weather alerts
 lat = 36.974117 # The latitute to check
 lon = -122.030792 # The longitude to check
 detailed_notification = false # If notifications will contain alert description instead of headline
-# notification_icon_path = None # The notification icon path or comment out to use Papirus notifications
+# notification_icon_path = "/usr/share/icons/someicon.svg" # The notification icon path or comment out to use Papirus notifications
 user_agent = "nwsd notification app (https://github.com/Camerooooon/nwsd)"
 ```
 

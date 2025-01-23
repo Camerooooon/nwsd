@@ -102,7 +102,7 @@ impl Default for Config {
             lon: -122.030792,
             detailed_notification: false,
             notification_icon_path: None,
-            user_agent: "my-weather-notification-app".to_string(),
+            user_agent: "nwsd notification app (https://github.com/Camerooooon/nwsd)".to_string(),
         }
     }
 }

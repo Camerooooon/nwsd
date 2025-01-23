@@ -76,24 +76,23 @@ The configuration file is used to customize the behavior of the daemon. By defau
 
 ```toml
 # Configuration file for NWSD
-lat = 40.7128       # Latitude for the weather alerts
-lon = -74.0060      # Longitude for the weather alerts
-update_interval = 600 # Update interval in seconds
-user_agent = "my-weather-app" # Custom User-Agent for API requests
+update_interval = 300 # How often to check the API for weather alerts
+lat = 36.974117 # The latitute to check
+lon = -122.030792 # The longitude to check
+detailed_notification = false # If notifications will contain alert description instead of headline
+# notification_icon_path = None # The notification icon path or comment out to use Papirus notifications
+user_agent = "nwsd notification app (https://github.com/Camerooooon/nwsd)"
 ```
 
-### Configuration Options:
+#### User Agent
 
-- **`lat`**: Latitude of the location to monitor.
-- **`lon`**: Longitude of the location to monitor.
-- **`update_interval`**: Interval (in seconds) between weather updates.
-- **`user_agent`**: Custom User-Agent string for API requests.
+The NWS API suggests a descriptive user-agent that is unique to every application. It is recommended to make your user-agent unique to prevent rate limiting.
 
 ## Development
 
 ### Project Structure
 
-- **`commands/`**: Contains the CLI commands and argument parsing logic.
+- **`commands/`**: Contains the CLI commands
 - **`daemon/`**: Core daemon logic for running the service.
 - **`weather/`**: Handles weather-related processing, including parsing and notifications.
 

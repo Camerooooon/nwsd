@@ -105,7 +105,3 @@ The NWS API suggests a descriptive user-agent that is unique to every applicatio
 3. Implement your changes and ensure the code is well-documented.
 4. Test your changes:
 5. Submit a pull request.
-
-## Disclaimer
-
-This software is not affiliated with or endorsed by the National Weather Service.

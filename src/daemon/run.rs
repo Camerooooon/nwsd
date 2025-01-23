@@ -14,7 +14,6 @@ pub fn run(mut daemon: Daemon) {
 
     let honk_shooo = time::Duration::from_millis(1000 * daemon.config.update_interval);
     loop {
-        thread::sleep(honk_shooo);
         let url = format!(
             "https://api.weather.gov/alerts/active?point={},{}",
             daemon.config.lat, daemon.config.lon
@@ -68,5 +67,6 @@ pub fn run(mut daemon: Daemon) {
 
             send_notification(&feature, &daemon.config);
         }
+        thread::sleep(honk_shooo);
     }
 }

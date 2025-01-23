@@ -63,7 +63,7 @@ pub fn run(mut daemon: Daemon) {
 
             println!("{}", feature);
 
-            // feature.properties.severity = Severity::Extreme;
+            // feature.properties.severity = Severity::Extreme; For testing
 
             send_notification(&feature, &daemon.config);
         }

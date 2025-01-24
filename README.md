@@ -11,6 +11,7 @@ A daemon for receiving desktop National Weather Service notifications through th
 
 - Rust (latest stable version recommended)
 - Network access to connect to [api.weather.gov](https://api.weather.gov)
+- [Papirus-Dark icons](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) (if you want per-alert icons)
 
 ## Installation
 
@@ -70,9 +71,9 @@ It is recommended to add the nwsd command to run when you start your desktop env
 
 ## Configuration
 
-The configuration file is used to customize the behavior of the daemon. By default, the configuration file is created in a standard directory (e.g., `$HOME/.nwsd/config.toml`), but a custom directory can be specified during initialization or runtime.
+The configuration file is used to customize the behavior of the daemon. By default, the configuration file is created in a standard directory (e.g., `~/.config/nwsd.toml`), but a custom directory can be specified during initialization or runtime.
 
-### Example Configuration (`config.toml`):
+### Example Configuration (`nwsd.toml`):
 
 ```toml
 # Configuration file for NWSD
@@ -80,9 +81,13 @@ update_interval = 300 # How often to check the API for weather alerts
 lat = 36.974117 # The latitute to check
 lon = -122.030792 # The longitude to check
 detailed_notification = false # If notifications will contain alert description instead of headline
-# notification_icon_path = "/usr/share/icons/someicon.svg" # The notification icon path or comment out to use Papirus notifications
+# notification_icon_path = "/usr/share/icons/someicon.svg" # The notification icon path or comment out to use Papirus-Dark icons 
 user_agent = "nwsd notification app (https://github.com/Camerooooon/nwsd)"
 ```
+
+#### Notification Icons
+
+If you have the papirus-dark icons installed nwsd will by default change the alert icon based on the weather alert. Otherwise you can specify a custom `notification_icon_path` that will override this default behavior. If you want to see which alerts correspond with which icons see the `get_icon_for_event` function in [weather.rs](https://github.com/Camerooooon/nwsd/blob/main/src/weather/weather.rs#L216)
 
 #### User Agent
 

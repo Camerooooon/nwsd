@@ -206,7 +206,7 @@ impl Display for Feature {
 pub fn get_notification_urgency_for_severity(severity: &Severity) -> Urgency {
     match severity {
         Severity::Extreme => Urgency::Critical,
-        Severity::Severe => Urgency::Critical,
+        Severity::Severe => Urgency::Normal,
         Severity::Moderate => Urgency::Normal,
         Severity::Minor => Urgency::Low,
         Severity::Unknown => Urgency::Normal,

@@ -62,10 +62,13 @@ pub fn parse_args() {
         NWSDCommand::InitConfig { config_directory } => {
             config::create_default_config(config_directory)
         }
-        NWSDCommand::Test { severity, config_directory } => {
+        NWSDCommand::Test {
+            severity,
+            config_directory,
+        } => {
             println!("{:?}", severity);
             let config = get_config(config_directory);
             test::test_alert(&config, &severity)
-        },
+        }
     }
 }

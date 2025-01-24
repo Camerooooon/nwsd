@@ -165,7 +165,7 @@ pub fn send_notification(alert_properties: &AlertProperties, config: &Config) {
 
     let timeout = match &alert_properties.severity {
         Severity::Extreme | Severity::Severe | Severity::Moderate | Severity::Unknown => 0, // Never timeout
-        Severity::Minor => 120*1000,
+        Severity::Minor => 120 * 1000,
     };
 
     Notification::new()
@@ -329,7 +329,7 @@ impl Display for Event {
 }
 
 impl FromStr for Severity {
-    type Err = String; 
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
@@ -357,5 +357,4 @@ pub fn generate_test_alert(severity: &Severity) -> AlertProperties {
         id: "urn:oid:2.49.0.1.840.0.4b440460568820c3135c6fa9bb92f30c621509d8.003.1".to_string(),
         event: Event::Test,
     }
-
 }

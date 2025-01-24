@@ -65,7 +65,7 @@ pub fn run(mut daemon: Daemon) {
 
             // feature.properties.severity = Severity::Extreme; For testing
 
-            send_notification(&feature, &daemon.config);
+            send_notification(&feature.properties, &daemon.config);
         }
         thread::sleep(honk_shooo);
     }

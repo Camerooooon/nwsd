@@ -1,8 +1,9 @@
 use structopt::StructOpt;
 
-use crate::commands::version;
-use crate::daemon::{self, config};
+use crate::commands::{test, version};
+use crate::daemon::{self, config, Config};
 use crate::print_warn;
+use crate::weather::weather::{AlertProperties, Severity};
 
 #[derive(StructOpt)]
 #[structopt(
@@ -12,7 +13,7 @@ use crate::print_warn;
 enum NWSDCommand {
     #[structopt(name = "run", alias = "r")]
     Run {
-        #[structopt(name = "config directory")]
+        #[structopt(short, long, name = "config directory")]
         config_directory: Option<String>,
 
         #[structopt(short, long, name = "debug")]
@@ -25,6 +26,26 @@ enum NWSDCommand {
     },
     #[structopt(name = "version", alias = "v")]
     Version {},
+    #[structopt(name = "test")]
+    Test {
+        #[structopt(name = "severity", parse(try_from_str))]
+        severity: Severity,
+
+        #[structopt(short, long, name = "config directory")]
+        config_directory: Option<String>,
+    },
+}
+
+fn get_config(config_directory: Option<String>) -> Config {
+    let config_option = config::load_config_from_file(config_directory);
+
+    match config_option {
+        Some(config) => config,
+        None => {
+            print_warn!("You have not initalized the config file yet. Please run nwsd init-config to create a config file. Reverting to default config.");
+            crate::daemon::Config::default()
+        }
+    }
 }
 
 pub fn parse_args() {
@@ -33,15 +54,7 @@ pub fn parse_args() {
             config_directory,
             debug,
         } => {
-            let config_option = config::load_config_from_file(config_directory);
-
-            let config = match config_option {
-                Some(config) => config,
-                None => {
-                    print_warn!("You have not initalized the config file yet. Please run nwsd init-config to create a config file. Reverting to default config.");
-                    crate::daemon::Config::default()
-                }
-            };
+            let config = get_config(config_directory);
             let daemon = daemon::init::init_daemon(config, debug);
             daemon::run::run(daemon)
         }
@@ -49,5 +62,10 @@ pub fn parse_args() {
         NWSDCommand::InitConfig { config_directory } => {
             config::create_default_config(config_directory)
         }
+        NWSDCommand::Test { severity, config_directory } => {
+            println!("{:?}", severity);
+            let config = get_config(config_directory);
+            test::test_alert(&config, &severity)
+        },
     }
 }

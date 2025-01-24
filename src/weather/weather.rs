@@ -1,5 +1,5 @@
 use notify_rust::{Notification, Urgency};
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 use efcl::{color, Color};
 use serde::Deserialize;
@@ -16,7 +16,7 @@ pub struct Feature {
     pub properties: AlertProperties,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum Severity {
     Extreme,
     Severe,
@@ -30,6 +30,9 @@ pub enum Severity {
 pub enum Event {
     #[serde(rename = "Hazardous Weather Outlook")]
     HazardousWeatherOutlook,
+
+    #[serde(rename = "Test")]
+    Test,
 
     // Winter Weather/Cold Weather
     #[serde(rename = "Winter Storm Watch")]
@@ -146,32 +149,32 @@ pub fn extract_weather_features(json_data: String) -> Vec<Feature> {
     geo_json.features
 }
 
-pub fn send_notification(feature: &Feature, config: &Config) {
+pub fn send_notification(alert_properties: &AlertProperties, config: &Config) {
     let icon_path = match &config.notification_icon_path {
         Some(a) => a,
         None => &format!(
             "/usr/share/icons/Papirus-Dark/symbolic/status/{}",
-            get_icon_for_event(&feature.properties.event)
+            get_icon_for_event(&alert_properties.event)
         ),
     };
 
     let body = match config.detailed_notification {
-        true => &feature.properties.description,
-        false => &feature.properties.headline,
+        true => &alert_properties.description,
+        false => &alert_properties.headline,
     };
 
-    let timeout = match feature.properties.severity {
+    let timeout = match &alert_properties.severity {
         Severity::Extreme | Severity::Severe | Severity::Moderate | Severity::Unknown => 0, // Never timeout
-        Severity::Minor => 120,
+        Severity::Minor => 120*1000,
     };
 
     Notification::new()
-        .summary(format!("{:?} Weather Alert", feature.properties.severity).as_str())
+        .summary(format!("{:?} Weather Alert", &alert_properties.severity).as_str())
         .body(body)
         .icon(icon_path)
         .appname("National Weather Service Daemon")
         .urgency(get_notification_urgency_for_severity(
-            &feature.properties.severity,
+            &alert_properties.severity,
         ))
         .timeout(timeout)
         .show()
@@ -268,6 +271,7 @@ pub fn get_icon_for_event(event: &Event) -> &'static str {
 
         // Fallback for unknown events
         Event::Unknown | Event::HazardousWeatherOutlook => "weather-severe-alert-symbolic.svg",
+        Event::Test => "weather-severe-alert-symbolic.svg",
     }
 }
 
@@ -317,8 +321,41 @@ impl Display for Event {
             Event::TropicalStormWarning => "Tropical Storm Warning",
             Event::HurricaneWatch => "Hurricane Watch",
             Event::HurricaneWarning => "Hurricane Warning",
-            Event::Unknown => "Unknown Event",
+            Event::Unknown => "Unknown",
+            Event::Test => "Test",
         };
         write!(f, "{}", readable)
     }
+}
+
+impl FromStr for Severity {
+    type Err = String; 
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "extreme" => Ok(Severity::Extreme),
+            "severe" => Ok(Severity::Severe),
+            "moderate" => Ok(Severity::Moderate),
+            "minor" => Ok(Severity::Minor),
+            _ => Ok(Severity::Unknown),
+        }
+    }
+}
+
+impl Display for Severity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+/// For testing purposes
+pub fn generate_test_alert(severity: &Severity) -> AlertProperties {
+    AlertProperties {
+        headline: "Test Alert issued January 23 at 12:25PM MST until January 24 at 5:00PM MST by NWS Missoula MT".to_string(),
+        description: "* THIS IS A TEST WHAT...Snow expected. Likelihood of minor impacts from snow is up\\nto 80 percent. Total snow accumulations between 1 and 3 inches.\\n\\n* WHERE...Bitterroot Valley and Missoula.\\n\\n* WHEN...From 2 AM to 5 PM MST Friday.\\n\\n* IMPACTS...For MINOR impacts from snow, expect a few inconveniences\\nto normal activities. Use caution while driving. The hazardous\\nconditions could impact the Friday morning and evening commutes,\\nespecially over higher passes.".to_string(),
+        severity: severity.clone(),
+        id: "urn:oid:2.49.0.1.840.0.4b440460568820c3135c6fa9bb92f30c621509d8.003.1".to_string(),
+        event: Event::Test,
+    }
+
 }

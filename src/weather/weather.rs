@@ -26,7 +26,7 @@ pub enum Severity {
 }
 
 // Thanks GPT!
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub enum Event {
     #[serde(rename = "Hazardous Weather Outlook")]
     HazardousWeatherOutlook,

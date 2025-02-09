@@ -4,7 +4,7 @@ use std::thread;
 use crate::{
     daemon::Daemon,
     print_debug, print_error, print_info,
-    weather::weather::{extract_weather_features, send_notification},
+    weather::weather::{extract_weather_features, send_notification, Event},
 };
 
 pub fn run(mut daemon: Daemon) {
@@ -52,10 +52,20 @@ pub fn run(mut daemon: Daemon) {
 
         let weather_features = extract_weather_features(response_text);
 
+        let mut already_alerted: Vec<Event> = vec![];
+
         for feature in weather_features {
             if daemon.acknowledged_alerts.contains(&feature.properties.id) {
                 continue;
             }
+
+            // Sometimes current weather alerts will contain duplicate entries. Just choose the
+            // first one
+            if already_alerted.contains(&feature.properties.event) {
+                continue;
+            }
+
+            already_alerted.push(feature.properties.event.clone());
 
             daemon
                 .acknowledged_alerts
